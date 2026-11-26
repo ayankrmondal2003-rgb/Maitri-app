@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Only for volunteers who turn on "Available" and choose "Allow all the time": a location report about every
+         15 minutes keeps them reachable for nearby SOS requests while Maitri is closed (ResponderLocation). -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- SOS voice notes, recorded only while screen 08 is open and the user taps Voice. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Nearby SOS requests open full screen where Android allows it; otherwise a heads-up notification. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <application
+        android:name=".MaitriApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/maitri_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/maitri_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Maitri">
+        <!-- WorkManager starts on demand (MaitriApp is its Configuration.Provider), not during app start-up. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data android:name="androidx.work.WorkManagerInitializer" android:value="androidx.startup" tools:node="remove" />
+        </provider>
+        <service android:name=".location.SosLocationService" android:exported="false" android:foregroundServiceType="location" />
+        <service
+            android:name=".notification.SosFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Maitri.Starting"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- Crash reporting starts only when MaitriApp turns it on (release builds, user hasn't opted out). -->
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+        <!-- Camera captures (volunteer documents, profile photo) and the bundled declaration template. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+        <!-- Nearby SOS request over the lock screen (full-screen intent); its own task so Back returns to what was open. -->
+        <activity
+            android:name=".ui.SosRequestActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity="in.maitri.app.sosrequest"
+            android:theme="@style/Theme.Maitri" />
+        <receiver android:name=".notification.SosRequestActionReceiver" android:exported="false" />
+        <!-- After an update: remind volunteers if Android switched lock-screen SOS alerts off (FullScreenReminder). -->
+        <receiver android:name=".notification.AppUpdatedReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
