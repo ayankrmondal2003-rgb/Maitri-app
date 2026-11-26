@@ -367,10 +367,14 @@ The team remains responsible for product decisions, source attribution, verifica
 ## Credits and license
 
 **Built by Team 4 Loops.**  
+- *Arpan Biswas*
+- *Ayan Kumar Mondal*
+- *Aritra Adak*
+- *Aritra Pal*
+
 **Maintainer:** [@ayankrmondal2003-rgb](https://github.com/ayankrmondal2003-rgb)  
 **Design:** [maitri Figma design](https://www.figma.com/design/Tsvh9SuF1INsZyS7EEnTFr/maitri?node-id=0-1)  
 **Core technologies:** Android/Jetpack Compose, Kotlin, Firebase, FastAPI, PostgreSQL/PostGIS, MapLibre, Render, Neon and Cloudflare R2.
-
 Third-party dependencies and bundled font/asset licenses retain their respective terms (for example, the [Inter font license](app/src/main/assets/licenses/Inter-OFL.txt)).
 
 **License status:** This repository does **not currently contain a top-level `LICENSE` file**. Public visibility does not automatically grant permission to copy, modify or redistribute the project. Team 4 Loops should choose and add an explicit license after confirming ownership and third-party obligations. Until then, no open-source license is asserted here.
